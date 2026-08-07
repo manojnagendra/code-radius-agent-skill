@@ -57,6 +57,26 @@ You get entry points, sibling surfaces, infra twins, test gaps, risks, an **edit
 
 Install via that client’s plugin UI using this repository, or place this directory where the client loads Agent Plugins (manifest at package root).
 
+### Codex / ChatGPT Work
+
+You are adding a **plugin marketplace**, not pasting a random sparse path. This repo includes Codex’s catalog at [`.agents/plugins/marketplace.json`](./.agents/plugins/marketplace.json).
+
+In **Add plugin marketplace**:
+
+| Field | Value |
+| ----- | ----- |
+| **Source** | `https://github.com/manojnagendra/code-radius-agent-skill` |
+| **Git ref** | `main` |
+| **Sparse paths** | **leave empty** (do not use `plugins/codex` — that path does not exist) |
+
+Then open the **Code Radius** marketplace source and install the `code-radius` plugin. Start a **new** chat and ask: *Map the Code Radius for … Don’t edit yet.*
+
+CLI equivalent:
+
+```bash
+codex plugin marketplace add https://github.com/manojnagendra/code-radius-agent-skill --ref main
+```
+
 ### Cursor (one supported client)
 
 **Marketplace / Directory:** search **Code Radius** / `code-radius`, or use [cursor.directory/plugins/code-radius](https://cursor.directory/plugins/code-radius).

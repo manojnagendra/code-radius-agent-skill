@@ -1,0 +1,20 @@
+{
+  "name": "code-radius",
+  "interface": {
+    "displayName": "Code Radius"
+  },
+  "plugins": [
+    {
+      "name": "code-radius",
+      "source": {
+        "source": "local",
+        "path": "./"
+      },
+      "policy": {
+        "installation": "AVAILABLE",
+        "authentication": "ON_INSTALL"
+      },
+      "category": "Productivity"
+    }
+  ]
+}
