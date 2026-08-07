@@ -6,6 +6,8 @@
   "author": {
     "name": "Code Radius"
   },
+  "homepage": "https://github.com/manojnagendra/code-radius-agent-skill",
+  "repository": "https://github.com/manojnagendra/code-radius-agent-skill",
   "license": "MIT",
   "keywords": [
     "code-radius",

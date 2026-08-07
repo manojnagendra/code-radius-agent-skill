@@ -145,10 +145,11 @@ code-radius/
 
 ## Publish & share
 
-1. Push this repo publicly (MIT).
+1. This repo is public: https://github.com/manojnagendra/code-radius-agent-skill
 2. Submit to the [Cursor Marketplace](https://cursor.com/marketplace/publish) (open source + review required).
-3. Demo clip: one prompt → Impact Radius Report → “go” → scoped edit → `radius-verify`.
-4. One-liner for posts: *Code Radius: don’t let your coding agent edit until it maps the impact radius.*
+3. Also list on [cursor.directory/plugins/new](https://cursor.directory/plugins/new) if that’s your discovery path.
+4. Demo clip: one prompt → Impact Radius Report → “go” → scoped edit → `radius-verify`.
+5. One-liner for posts: *Code Radius: don’t let your coding agent edit until it maps the impact radius.*
 
 ---
 
