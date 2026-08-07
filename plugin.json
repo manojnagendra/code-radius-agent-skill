@@ -2,7 +2,7 @@
   "$schema": "https://agent-plugins.org/schemas/1.0.0/plugin.schema.json",
   "name": "code-radius",
   "version": "1.0.0",
-  "description": "Code Radius stops AI coding agents from editing before they know what a change will touch. Before any non-trivial feature, bugfix, rename, or migration, it produces a cited Impact Radius Report—entry points, callers, shared modules, contracts, tests, infra, and risks—plus a bounded edit set. Implement only inside that set; verify the diff afterward. No API keys. Portable Agent Skills for Cursor, ChatGPT/Codex, Copilot, VS Code, and Kiro.",
+  "description": "Agent Plugins (open standard) skill pack: map the impact radius of a code change before editing. Produces a cited affected-surface report and bounded edit set for features, bugfixes, renames, and migrations. Works in any Agent Plugins client (ChatGPT/Codex, Cursor, Copilot, VS Code, Kiro, …). No MCP. No API keys.",
   "author": {
     "name": "Code Radius"
   },
@@ -10,6 +10,8 @@
   "repository": "https://github.com/manojnagendra/code-radius-agent-skill",
   "license": "MIT",
   "keywords": [
+    "agent-plugins",
+    "agent-skills",
     "code-radius",
     "impact-analysis",
     "impact-radius",
@@ -20,10 +22,7 @@
     "code-review",
     "rename",
     "migration",
-    "auth",
     "working-set",
-    "caller-analysis",
-    "test-gaps",
-    "scope-creep"
+    "portable"
   ]
 }

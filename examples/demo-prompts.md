@@ -1,6 +1,6 @@
 # Code Radius — demo & share prompts
 
-Copy-paste these to try the plugin, record a demo, or post socially.
+Works in any **Agent Plugins** client that loads this package’s skills. Copy-paste to try, record a demo, or post socially.
 
 ## 30-second demo
 
@@ -54,10 +54,10 @@ Run radius-verify on my current diff against the last Code Radius edit set.
 
 ## Social one-liners
 
-- Code Radius: don’t let your coding agent edit until it maps what the change will touch.
-- Impact report → bounded edit set → implement → verify. Portable Agent Plugin, no API keys.
-- Stop merge surprises. Run Code Radius before the first keystroke of a risky change.
+- Code Radius: an Agent Plugins skill pack—don’t edit until the impact radius is mapped.
+- Impact report → bounded edit set → implement → verify. Open standard, no API keys.
+- Portable across Agent Plugins clients. One `plugin.json`, three skills.
 
-## Hashtags / discovery terms
+## Discovery terms
 
-`#AgentPlugins` `#Cursor` `#Codex` `#AICoding` `#CodeRadius` `impact analysis` `edit set` `safe refactor`
+`#AgentPlugins` `#AgentSkills` `#CodeRadius` `impact analysis` `edit set` `safe refactor`

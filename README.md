@@ -2,162 +2,105 @@
 
 **Don’t edit until you know what the change will touch.**
 
-Code Radius is an [Agent Plugin](https://agent-plugins.org/) that teaches AI coding agents to run **task-scoped impact analysis** before they write code. Install once. Works across clients that support Agent Plugins—Cursor, ChatGPT/Codex, GitHub Copilot, VS Code, Kiro, and more.
+Code Radius is an **[Agent Plugin](https://agent-plugins.org/)** (open standard v1.0.0). It packages portable **[Agent Skills](https://agentskills.io/)** so any compatible agent client can load the same plugin—without a Cursor-only manifest, MCP server, or API keys.
 
-No API keys. No hosted MCP. Pure portable [Agent Skills](https://agentskills.io/).
-
----
-
-## The problem (why people install this)
-
-Agents are great at *finding* files and bad at *scoping* a change.
-
-Typical failure:
-
-1. You ask: “Add rate limiting to login.”
-2. The agent finds one route handler, edits it, and declares victory.
-3. It missed mobile OAuth sharing the same session helper, a CLI login path, a gateway that already throttles `/auth/*`, and tests that never covered the CLI.
-4. You find out in code review—or in production.
-
-**Code Radius fixes the workflow, not the model.** Before edits, the agent must publish a cited **Impact Radius Report** and a **bounded edit set**. After edits, it can verify the diff stayed in-scope.
+Compatible clients at the Agent Plugins launch include ChatGPT/Codex, Cursor, GitHub Copilot, Kiro, and VS Code. One package; each client discovers `plugin.json` and `skills/` the same way.
 
 ---
 
-## What you get
+## Open standard conformance
 
-| Skill | When it runs | What it does |
-| ----- | ------------ | ------------ |
-| **`radius`** | Before non-trivial work | Impact Radius Report + edit set / leave-alone list |
-| **`radius-gate`** | Mid-task if edits start early | Blocks writes until recon is done (or you override) |
-| **`radius-verify`** | After the diff / before PR | Checks scope drift and missing tests from the report |
+This repo is intentionally **not** a Cursor-only plugin (no `.cursor-plugin/` required).
 
-### Sample output (the viral demo)
+| Spec | What we ship |
+| ---- | ------------ |
+| [Agent Plugins 1.0.0](https://agent-plugins.org/) | Root [`plugin.json`](./plugin.json) with `$schema`: `https://agent-plugins.org/schemas/1.0.0/plugin.schema.json` |
+| [Agent Skills](https://agentskills.io/specification) | [`skills/*/SKILL.md`](./skills/) (+ optional `references/`) |
+| Optional MCP | None (not required for this plugin) |
+| Client extensions | None (no reverse-domain Cursor-only extras in the portable contract) |
 
-Ask:
+Layout:
+
+```text
+code-radius/
+├── plugin.json          # Agent Plugins manifest (required)
+├── skills/
+│   ├── radius/          # Agent Skill
+│   ├── radius-gate/
+│   └── radius-verify/
+├── examples/
+├── LICENSE              # MIT
+└── README.md
+```
+
+---
+
+## What it does
+
+AI agents are good at *finding* files and bad at *scoping* a change. They often edit after a shallow search, miss callers and tests, and you discover the real impact in review.
+
+**Code Radius** makes **task-scoped impact recon** a first-class step:
+
+1. **`radius`** — cited Impact Radius Report + bounded edit set **before** edits  
+2. **`radius-gate`** — stop mid-task if edits start without a report or drift past the edit set  
+3. **`radius-verify`** — after the diff, confirm it stayed in-scope  
+
+### Example
 
 > Map the Code Radius for adding rate limiting to login. Don’t edit yet.
 
-You get something like:
-
-- **Entry:** `POST /auth/login` → `src/routes/auth.ts:88`
-- **Also hits:** OAuth callback + CLI login (shared `issueSession`)
-- **Infra:** Kong already limits `/auth/*`
-- **Risks:** double limiting on NAT; mobile refresh pattern
-- **Edit set:** 4 files · **Leave alone:** gateway + OAuth until product decides
-- **Ready to implement?** waiting for go
-
-That screenshot/shareable report is the product.
+You get entry points, sibling surfaces, infra twins, test gaps, risks, an **edit set**, and **leave alone**—then the agent waits for go.
 
 ---
 
-## Install
+## Install (any Agent Plugins client)
 
-### Cursor
+Install via that client’s plugin UI using this repository, or place this directory where the client loads Agent Plugins (manifest at package root).
 
-**Marketplace** (when listed): **Customize** → search **Code Radius** / `code-radius` → **Install** (user or project).
+### Cursor (one supported client)
 
-**Local (dev / early access):**
+**Marketplace / Directory:** search **Code Radius** / `code-radius`, or use [cursor.directory/plugins/code-radius](https://cursor.directory/plugins/code-radius).
+
+**Local load:** Cursor only loads plugins **inside** `~/.cursor/plugins/local/` (symlinks pointing outside that folder are rejected):
 
 ```bash
-mkdir -p ~/.cursor/plugins/local
-ln -sfn "/absolute/path/to/this/repo" ~/.cursor/plugins/local/code-radius
+mkdir -p ~/.cursor/plugins/local/code-radius
+rsync -a --delete --exclude '.git' --exclude 'logo.png' ./ ~/.cursor/plugins/local/code-radius/
 ```
 
-Then **Developer: Reload Window**. Confirm `radius`, `radius-gate`, and `radius-verify` under Customize → Skills.
-
-### Other Agent Plugins clients
-
-Install through that client’s plugin UI, or place this directory where the client loads Agent Plugins (`plugin.json` at the package root).
+Then reload the window. Skills: `radius`, `radius-gate`, `radius-verify`.
 
 ---
 
-## How to use (daily)
+## How to use
 
-### Automatic
+**Automatic:** For features, refactors, renames, migrations, auth/payments, or shared modules, the agent should pick up `radius` from the skill description and recon before editing.
 
-For features, refactors, renames, migrations, auth/payments, or shared modules, the agent should pick up `radius` from the skill description and recon **before** editing.
-
-### Manual prompts that work well
+**Manual:**
 
 ```text
-/radius
 Map the Code Radius for <change>. Don’t edit yet.
 ```
 
 ```text
-Code Radius this: rename UserService → AccountService across the API.
+Run radius-verify against the last edit set.
 ```
 
-```text
-Don’t edit—run Code Radius on this ticket first.
-```
-
-```text
-We think we’re done. Run radius-verify against the edit set.
-```
-
-### When to insist on it
-
-- Auth, sessions, permissions, billing
-- DB migrations and schema changes
-- Renames / moves of shared modules
-- Anything that might have a twin in gateway, cron, or mobile
-- Onboarding to an unfamiliar area of a large repo (task-scoped, not a full atlas)
-
-### When to skip
-
-- Typo / comment / single-line local fix
-- You explicitly say `skip radius` or `just do it`
+More prompts: [`examples/demo-prompts.md`](./examples/demo-prompts.md).
 
 ---
 
 ## How it’s different
 
-| Approach | What it optimizes for | Code Radius |
-| -------- | --------------------- | ----------- |
+| Approach | Optimizes for | Code Radius |
+| -------- | ------------- | ----------- |
 | Repo map / onboarding skills | “Explain the architecture” | “What does **this change** touch?” |
-| Package / OSS context layers | Dependencies outside your repo | Impact inside **your** working tree |
+| OSS/package context layers | Dependencies outside your repo | Impact inside **your** tree |
 | Search / grep | Find mentions | Ranked radius + **edit gate** |
 | PR bots | Catch damage after the diff | Force recon **before** the diff |
 
-**Unique claim:** task-scoped impact recon as a portable Agent Plugin skill pack—cited report, bounded edit set, optional verify—not another architecture dump.
-
 ---
-
-## Package layout
-
-```text
-code-radius/
-├── plugin.json          # Agent Plugins 1.0.0 manifest
-├── LICENSE              # MIT
-├── README.md
-├── examples/
-│   └── demo-prompts.md  # Copy-paste prompts for demos & social
-└── skills/
-    ├── radius/          # Main impact mapping skill
-    │   ├── SKILL.md
-    │   └── references/
-    ├── radius-gate/     # No-edit-until-mapped
-    └── radius-verify/   # Diff vs edit set
-```
-
----
-
-## Publish & share
-
-1. This repo is public: https://github.com/manojnagendra/code-radius-agent-skill
-2. Submit to the [Cursor Marketplace](https://cursor.com/marketplace/publish) (open source + review required).
-3. Also list on [cursor.directory/plugins/new](https://cursor.directory/plugins/new) if that’s your discovery path.
-4. Demo clip: one prompt → Impact Radius Report → “go” → scoped edit → `radius-verify`.
-5. One-liner for posts: *Code Radius: don’t let your coding agent edit until it maps the impact radius.*
-
----
-
-## Spec compliance
-
-- [Agent Plugins 1.0.0](https://agent-plugins.org/) — `plugin.json` + `skills/`
-- [Agent Skills](https://agentskills.io/specification) — each `SKILL.md`
 
 ## License
 
-MIT — use it, fork it, ship it with your team marketplace.
+MIT — portable under the Agent Plugins / Agent Skills ecosystem.
